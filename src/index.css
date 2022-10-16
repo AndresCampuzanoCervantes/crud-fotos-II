@@ -1,8 +1,11 @@
 :root {
-  font-family: 'Work Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #dad8d0;
+}
+
+body{
+  font-family: 'Work Sans', sans-serif;
+  background-color: rgb(247, 247, 247);
 }
 
 ::-webkit-scrollbar {
