@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { DataGrid, GridToolbarContainer, GridToolbarColumnsButton } from '@mui/x-data-grid';
 import { collection, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
 import { columnsGridPinture, theme } from '../structure/data';
@@ -7,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
 import { db } from '../structure/firebase';
 import Swal from 'sweetalert2'
+import "../index.css"
 
 const Home = () => {
     const [rows, setRows] = useState([]);

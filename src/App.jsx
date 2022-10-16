@@ -1,6 +1,7 @@
 
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Create, Home, Edit } from './pages';
+import "./index.css"
 const App = () => {
 
   return (
