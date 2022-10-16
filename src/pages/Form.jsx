@@ -97,43 +97,43 @@ const Form = () => {
     }
 
     const validateFields = () => {
-        if (name.length === 0) {
+        if (name.trim().length === 0) {
             setErrorMessage("Debe llenar el campo de Nombre.");
             setError(true);
             return true;
         }
 
-        if (author.length === 0) {
+        if (author.trim().length === 0) {
             setErrorMessage("Debe llenar el campo de Autor.");
             setError(true);
             return true;
         }
 
-        if (city.length === 0) {
+        if (city.trim().length === 0) {
             setErrorMessage("Debe llenar el campo de Ciudad.");
             setError(true);
             return true;
         }
 
-        if (captureDate.length === 0) {
+        if (captureDate.trim().length === 0) {
             setErrorMessage("Debe llenar el campo de Fecha de captura.");
             setError(true);
             return true;
         }
 
-        if (phone.length === 0) {
+        if (phone.trim().length === 0) {
             setErrorMessage("Debe llenar el campo de Teléfono.");
             setError(true);
             return true;
         }
 
-        if (price.length === 0) {
+        if (price.trim().length === 0) {
             setErrorMessage("Debe llenar el campo de Costo.");
             setError(true);
             return true;
         }
 
-        if (description.length === 0) {
+        if (description.trim().length === 0) {
             setErrorMessage("Debe llenar el campo de Descripción.");
             setError(true);
             return true;
