@@ -1,11 +1,12 @@
 import { DataGrid, GridToolbarContainer, GridToolbarColumnsButton } from '@mui/x-data-grid';
+import { collection, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
 import { columnsGridPinture, theme } from '../structure/data';
 import { ThemeProvider } from '@mui/material/styles';
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
-import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../structure/firebase';
+import Swal from 'sweetalert2'
 
 const Home = () => {
     const [rows, setRows] = useState([]);
@@ -18,10 +19,10 @@ const Home = () => {
 
     const obtenerDatos = async () => {
         try {
-            setLoading(true)
+            setLoading(true);
             await onSnapshot(collection(db, 'pictureSale'), (query) => {
-                setRows(query.docs.map((doc) => ({ ...doc.data(), id: doc.id, updateDoc, deleteDoc })))
-                setTimeout(() => setLoading(false), 1000)
+                setRows(query.docs.map((doc) => ({ ...doc.data(), id: doc.id, updateDoc, DeleteDoc })));
+                setTimeout(() => setLoading(false), 1000);
             });
         } catch (error) {
             console.log(error);
@@ -32,8 +33,41 @@ const Home = () => {
         history('/edit/' + id)
     }
 
-    const deleteDoc = (id) => {
-        // history('/edit/' + id)
+    const DeleteDoc = (id) => {
+        Swal.fire({
+            title: 'Seguro que desea eliminar la imagen en venta?',
+            showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+            },
+            showCancelButton: true,
+            cancelButtonColor: 'rgb(95 96 96)',
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Confirmar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true,
+            icon: 'warning',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                try {
+                    setLoading(true);
+                    deleteDoc(doc(db, 'pictureSale', id)).then(() => {
+                        setLoading(false);
+                        Swal.fire({
+                            title: 'Eliminado.',
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false,
+                        })
+                    });
+                } catch (error) {
+                    console.error(error);
+                }
+
+            }
+        })
     }
 
     const EditToolbar = (props) => {

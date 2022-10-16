@@ -1,4 +1,5 @@
-import { AccountCircle, LocationCityRounded, Phone, PriceChange, Description, Pinterest, Cancel, Edit, Save, ArrowBack } from "@mui/icons-material";
+/* eslint-disable react-hooks/exhaustive-deps */
+import { AccountCircle, LocationCityRounded, Phone, PriceChange, Description, Pinterest, Cancel, Edit, Save } from "@mui/icons-material";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { Alert, Button, InputAdornment, TextField } from "@mui/material";
 import { collection, addDoc, updateDoc, doc, onSnapshot } from "firebase/firestore"
@@ -136,6 +137,9 @@ const Form = () => {
             setErrorMessage("Debe llenar el campo de Descripción.");
             setError(true);
             return true;
+        }else{
+            setErrorMessage("");
+            setError(false);
         }
 
         return false;
@@ -199,6 +203,7 @@ const Form = () => {
             e.preventDefault();
             setLoading(true);
             if (validateFields()) {
+                setLoading(false);
                 return;
             } else {
                 setError(false);

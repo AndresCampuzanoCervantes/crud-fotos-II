@@ -31,10 +31,10 @@ const renderEditButtons = ({ row }) => {
     )
 };
 const renderDeleteButtons = ({ row }) => {
-    const { updateDoc, id } = row;
+    const { DeleteDoc, id } = row;
 
     return (
-        <Button variant="contained" startIcon={<Delete />} color="error" onClick={() => { updateDoc(id) }}>
+        <Button variant="contained" startIcon={<Delete />} color="error" onClick={() => { DeleteDoc(id) }}>
             Eliminar
         </Button>
     )
@@ -51,37 +51,45 @@ export const columnsGridPinture = [
     {
         field: 'name',
         headerName: 'Nombre',
-        minWidth: 180
+        minWidth: 180,
+        headerAlign : 'center',
     },
     {
         field: 'city',
         headerName: 'Ciudad',
-        minWidth: 150
+        minWidth: 150,
+        align: "center",
+        headerAlign : 'center',
     },
     {
         field: 'captureDate',
         headerName: 'Fecha de Captura',
-        minWidth: 150
+        minWidth: 150,
+        align: "center",
+        headerAlign : 'center',
     },
     {
         field: 'author',
         headerName: 'Autor',
-        minWidth: 150
+        minWidth: 150,
+        headerAlign : 'center',
     },
     {
         field: 'phone',
         headerName: 'Teléfono',
-        minWidth: 100
+        minWidth: 100,
+        headerAlign : 'center',
     },
     {
         field: 'price',
         headerName: 'Valor',
-        minWidth: 100
+        minWidth: 100,
+        headerAlign : 'center',
     },
     {
         field: 'description',
         headerName: 'Descripción',
-        minWidth: 412
+        minWidth: 412,
     },
     {
         field: 'updateDoc',
@@ -91,7 +99,7 @@ export const columnsGridPinture = [
         align: "center",
     },
     {
-        field: 'deleteDoc',
+        field: 'DeleteDoc',
         headerName: '',
         minWidth: 150,
         renderCell: renderDeleteButtons,
