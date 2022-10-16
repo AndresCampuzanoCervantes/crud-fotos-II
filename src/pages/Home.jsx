@@ -1,26 +1,50 @@
-import { useState, useEffect, useRef } from 'react'
-import { ThemeProvider } from '@mui/material/styles';
 import { DataGrid, GridToolbarContainer, GridToolbarColumnsButton } from '@mui/x-data-grid';
 import { columnsGridPinture, theme } from '../structure/data';
+import { ThemeProvider } from '@mui/material/styles';
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
-
-const dataTest = { 
-    id: 1, 
-    name: 'name', 
-    city: 'nombre', 
-    price: '$1', 
-    description: 'Aliquam dapibus, lorem vel mattis aliquet, purus lorem tincidunt mauris, in blandit quam risus sed ipsum Aliquam dapibus, Aliquam dapibus, lorem vel mattis aliquet, purus lorem tincidunt mauris, in blandit quam risus sed ipsum lorem vel mattis aliquet, purus lorem tincidunt mauris, in blandit quam risus sed ipsum Aliquam dapibus, lorem vel mattis aliquet, purus lorem tincidunt mauris, in blandit quam risus sed ipsum', 
-    author: 'sadf', 
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from '../structure/firebase';
+const dataTest = {
+    id: 1,
+    name: 'name',
+    city: 'nombre',
+    price: '$1',
+    description: 'Aliquam dapibus, lorem vel mattis aliquet, purus lorem tincidunt mauris, in blandit quam risus sed ipsum Aliquam dapibus, Aliquam dapibus, lorem vel mattis aliquet, purus lorem tincidunt mauris, in blandit quam risus sed ipsum lorem vel mattis aliquet, purus lorem tincidunt mauris, in blandit quam risus sed ipsum Aliquam dapibus, lorem vel mattis aliquet, purus lorem tincidunt mauris, in blandit quam risus sed ipsum',
+    author: 'sadf',
     phone: 'asdf',
     imagen: 'https://picsum.photos/150',
-    captureDate:"16/10/2022" 
+    captureDate: "16/10/2022"
 }
 const Home = () => {
-    const [rows, setRows] = useState([dataTest]);
+    const [rows, setRows] = useState([]);
     const [loading, setLoading] = useState(false);
     const history = useNavigate();
 
+    useEffect(() => {
+        obtenerDatos()
+    }, []);
+
+    const obtenerDatos = async () => {
+        try {
+            setLoading(true)
+            await onSnapshot(collection(db, 'pictureSale'), (query) => {
+                setRows(query.docs.map((doc) => ({ ...doc.data(), id: doc.id, updateDoc, deleteDoc })))
+                setTimeout(() => setLoading(false), 1000)
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const updateDoc = (id) => {
+        history('/edit/' + id)
+    }
+
+    const deleteDoc = (id) => {
+        history('/edit/' + id)
+    }
 
     const EditToolbar = (props) => {
         const { history } = props;
@@ -31,13 +55,13 @@ const Home = () => {
         return (
             <GridToolbarContainer className='border-bottom'>
                 <GridToolbarColumnsButton className='m-2' variant="contained" />
-                <GridToolbarColumnsButton color="primary"  startIcon={<AddIcon />} onClick={() => { history("/create") }} variant="contained" className='m-2' ref={referent => ref.current = referent} />
+                <GridToolbarColumnsButton color="primary" startIcon={<AddIcon />} onClick={() => { history("/create") }} variant="contained" className='m-2' ref={referent => ref.current = referent} />
             </GridToolbarContainer>
         );
     }
 
     return (
-        <div style={{ height: 400, width: '100%' }}>
+        <div style={{ height: 800, width: '100%' }}>
             <div style={{ display: 'flex', height: '100%' }}>
                 <div style={{ flexGrow: 1 }}>
                     <ThemeProvider theme={theme}>

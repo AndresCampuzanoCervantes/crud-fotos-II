@@ -1,9 +1,9 @@
-import { AccountCircle, LocationCityRounded, Phone, PriceChange, Description, Pinterest, Add, Cancel, } from "@mui/icons-material";
+import { AccountCircle, LocationCityRounded, Phone, PriceChange, Description, Pinterest, Cancel, Edit, Save, ArrowBack} from "@mui/icons-material";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { Alert, Button, InputAdornment, TextField } from "@mui/material";
-import { collection, addDoc, updateDoc} from "firebase/firestore"
+import { collection, addDoc, updateDoc } from "firebase/firestore"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { db } from "../structure/firebase";
 import axios from "axios";
@@ -11,7 +11,9 @@ import dayjs from "dayjs";
 import 'dayjs/locale/es';
 
 const Form = () => {
+    const params = useParams();
     const history = useNavigate();
+    const [id, setId] = useState('');
     const [name, setName] = useState('');
     const [author, setAuthor] = useState('');
     const [city, setCity] = useState('');
@@ -22,6 +24,7 @@ const Form = () => {
     const [description, setDescription] = useState('');
     const [error, setError] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [editMode, setEditMode] = useState(false);
 
     useEffect(() => {
         if (error) {
@@ -30,7 +33,13 @@ const Form = () => {
     }, [name, author, city, captureDate, phone, price, description]);
 
     useEffect(() => {
-        getImagen()
+        if (params.id) {
+            setId(params.id);
+            setEditMode(true);
+        } else {
+            getImagen()
+        }
+
     }, []);
 
     const getImagen = () => {
@@ -163,7 +172,7 @@ const Form = () => {
         }
     }
 
-    const handelSubmit = async(e) => {
+    const handelSubmit = async (e) => {
         try {
             e.preventDefault();
 
@@ -184,7 +193,7 @@ const Form = () => {
                 description,
                 imagen
             }
-            const data = await addDoc(collection(db,'pictureSale'),newPictureSale);
+            const data = await addDoc(collection(db, 'pictureSale'), newPictureSale);
 
             if (data.id) {
                 history("/");
@@ -326,15 +335,30 @@ const Form = () => {
                     error={error && description.length === 0}
                 />
                 <div>
-                    <Button
-                        variant="contained"
-                        className="float-end mx-4"
-                        color="primary"
-                        type="submit"
-                        startIcon={<Add />}
-                    >
-                        Registrar
-                    </Button>
+                    {
+                        editMode ? (
+                            <Button
+                                variant="contained"
+                                className="float-end mx-4"
+                                color="primary"
+                                type="submit"
+                                startIcon={<Edit />}
+                            >
+                                Editar
+                            </Button>
+                        ) : (
+                            <Button
+                                variant="contained"
+                                className="float-end mx-4"
+                                color="primary"
+                                type="submit"
+                                startIcon={<Save />}
+                            >
+                                Registrar
+                            </Button>
+                        )
+                    }
+
                     <Button
                         variant="contained"
                         className="float-end"

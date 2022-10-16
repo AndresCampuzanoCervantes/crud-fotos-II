@@ -1,6 +1,6 @@
-import { Container } from '@mui/material';
+
 import { Routes, Route, Navigate } from "react-router-dom";
-import { Create, Home } from './pages';
+import { Create, Home, Edit } from './pages';
 const App = () => {
 
   return (
@@ -12,6 +12,7 @@ const App = () => {
         <Route path="/" element={<Navigate to="/home" replace={true} />} />
         <Route path="/home" element={<Home />} />
         <Route path="/create" element={<Create />} />
+        <Route path="/edit/:id" element={<Edit />} />
       </Routes>
     </div>
   )
