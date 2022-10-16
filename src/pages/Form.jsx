@@ -1,25 +1,236 @@
-import React from 'react'
-import TextField from '@mui/material/TextField';
-import { Button, InputAdornment, TextareaAutosize } from '@mui/material';
-import { AccountCircle, LocationCityRounded, Edit, Phone, PriceChange, Description } from '@mui/icons-material';
+import { useState, useEffect } from "react";
+import { Alert, Button, InputAdornment, TextField } from "@mui/material";
+import {
+    AccountCircle,
+    LocationCityRounded,
+    Phone,
+    PriceChange,
+    Description,
+    Event,
+    Pinterest,
+} from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+import dayjs from "dayjs";
+import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import 'dayjs/locale/es';
+import axios from "axios";
 
-const dataTest = {
-    id: 1,
-    name: 'name',
-    city: 'nombre',
-    price: '$1',
-    description: 'Aliquam dapibus, lorem vel mattis aliquet, purus lorem tincidunt mauris, in blandit quam risus sed ipsum Aliquam dapibus, Aliquam dapibus, lorem vel mattis aliquet, purus lorem tincidunt mauris, in blandit quam risus sed ipsum lorem vel mattis aliquet, purus lorem tincidunt mauris, in blandit quam risus sed ipsum Aliquam dapibus, lorem vel mattis aliquet, purus lorem tincidunt mauris, in blandit quam risus sed ipsum',
-    author: 'sadf',
-    phone: 'asdf'
-}
 const Form = () => {
+    const history = useNavigate();
+    const [name, setName] = useState('');
+    const [author, setAuthor] = useState('');
+    const [city, setCity] = useState('');
+    const [captureDate, setCaptureDate] = useState(dayjs());
+    const [phone, setPhone] = useState('');
+    const [price, setPrice] = useState('$');
+    const [imagen, setImagen] = useState('');
+    const [description, setDescription] = useState('');
+    const [error, setError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+
+    useEffect(() => {
+        if (error) {
+            validateFields();
+        }
+    }, [name, author, city, captureDate, phone, price, description]);
+
+    useEffect(() => {
+        getImagen()
+    }, []);
+
+    const getImagen = () => {
+        axios.get("https://picsum.photos/300")
+            .then(({ request }) => {
+                setImagen(request.responseURL);
+            }).catch((error) => {
+                console.error(error);
+            })
+    }
+
+    const PesoFormat = (number) => {
+        const operateNum = number.replaceAll(',', '')
+            .replaceAll('$', '')
+            .split('').reverse()
+        let result = [], len = operateNum.length
+        for (var i = 0; i < len; i++) {
+            result.push(operateNum[i])
+            if (((i + 1) % 3 === 0) && (i !== len - 1)) {
+                result.push(',')
+            }
+        }
+
+        setPrice('$' + result.reverse().join(''))
+    }
+
+    const soloNumeros = (e) => {
+        const key = e.charCode;
+        if (!(key >= 48 && key <= 57)) {
+            e.preventDefault();
+        }
+    }
+
+    const validateFields = () => {
+        if (name.length === 0) {
+            setErrorMessage("Debe llenar el campo de Nombre.");
+            setError(true);
+            return true;
+        }
+
+        if (author.length === 0) {
+            setErrorMessage("Debe llenar el campo de Autor.");
+            setError(true);
+            return true;
+        }
+
+        if (city.length === 0) {
+            setErrorMessage("Debe llenar el campo de Ciudad.");
+            setError(true);
+            return true;
+        }
+
+        if (captureDate.length === 0) {
+            setErrorMessage("Debe llenar el campo de Fecha de captura.");
+            setError(true);
+            return true;
+        }
+
+        if (phone.length === 0) {
+            setErrorMessage("Debe llenar el campo de Teléfono.");
+            setError(true);
+            return true;
+        }
+
+        if (price.length === 0) {
+            setErrorMessage("Debe llenar el campo de Costo.");
+            setError(true);
+            return true;
+        }
+
+        if (description.length === 0) {
+            setErrorMessage("Debe llenar el campo de Descripción.");
+            setError(true);
+            return true;
+        }
+
+        return false;
+    }
+
+    const handelName = (e) => {
+        setName(e.target.value);
+        if (error) {
+            validateFields();
+        }
+    }
+
+    const handelAuthor = (e) => {
+        setAuthor(e.target.value);
+        if (error) {
+            validateFields();
+        }
+    }
+
+    const handelCity = (e) => {
+        setCity(e.target.value);
+        if (error) {
+            validateFields();
+        }
+    }
+
+    const handelCaptureDate = (e) => {
+        setCaptureDate(e);
+        if (error) {
+            validateFields();
+        }
+    }
+
+    const handelPhone = (e) => {
+        if (e.target.value.length <= 10) {
+            setPhone(e.target.value);
+            if (error) {
+                validateFields();
+            }
+        } else {
+            e.preventDefault();
+        }
+    }
+
+    const handelPrice = (e) => {
+        PesoFormat(e.target.value);
+        if (error) {
+            validateFields();
+        }
+    }
+
+    const handelDescription = (e) => {
+        setDescription(e.target.value);
+        if (error) {
+            validateFields();
+        }
+    }
+
+    const handelSubmit = (e) => {
+        e.preventDefault();
+        if (validateFields()) {
+            return;
+        } else {
+            setError(false);
+            setErrorMessage('');
+        }
+        const newPictureSale = {
+            name,
+            author,
+            city,
+            captureDate: captureDate.format('DD/MM/YYYY'),
+            phone,
+            price,
+            description
+        }
+    }
+    //onSubmit={modoEdicion ? editarFrutas : guardarFrutas}
+
     return (
-        <form >
-            <div className='d-flex flex-column col-11 justify-content-center'>
+        <form onSubmit={handelSubmit}>
+            <div className="d-flex flex-column col-11 justify-content-center">
+                {
+                    error && (
+                        <Alert variant="filled" severity="error">
+                            <strong>Error. </strong>
+                            {errorMessage}
+                        </Alert>
+                    )
+                }
+                {
+                    imagen.length > 0 ? (
+                        <div className="text-center">
+                            <img src={imagen} alt={name} height={200} width={200} className="rounded-circle" />
+                        </div>
+                    ) : (
+                        <div className="d-flex justify-content-center">
+                            <div className="spinner-border loading" role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    )
+                }
                 <TextField
                     label="Nombre"
                     variant="standard"
-                    required
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <Pinterest />
+                            </InputAdornment>
+                        ),
+                    }}
+                    className="m-2 mt-4"
+                    onChange={handelName}
+                    value={name}
+                    error={error && name.length === 0}
+                />
+                <TextField
+                    label="Autor"
+                    variant="standard"
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
@@ -27,85 +238,108 @@ const Form = () => {
                             </InputAdornment>
                         ),
                     }}
-                    className='m-2 mt-4'
+                    className="m-2 mt-4"
+                    onChange={handelAuthor}
+                    value={author}
+                    error={error && author.length === 0}
                 />
                 <TextField
                     label="Ciudad"
                     variant="standard"
-                    required
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
-                                < LocationCityRounded />
+                                <LocationCityRounded />
                             </InputAdornment>
                         ),
                     }}
-                    className='m-2'
+                    className="m-2"
+                    onChange={handelCity}
+                    value={city}
+                    error={error && city.length === 0}
                 />
-                <TextField
-                    label="Autor"
-                    variant="standard"
-                    required
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                < Edit />
-                            </InputAdornment>
-                        ),
-                    }}
-                    className='m-2'
-                />
+                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
+                    <DatePicker
+                        disableFuture
+                        label="Fecha de captura"
+                        views={["year", "month", "day"]}
+                        value={captureDate}
+                        onChange={handelCaptureDate}
+                        renderInput={(params) => < TextField  {...params} variant="standard" className="m-2" error={error && captureDate.length === 0} />}
+                    />
+                </LocalizationProvider>
                 <TextField
                     label="Teléfono"
                     variant="standard"
-                    required
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
-                                < Phone />
+                                <Phone />
                             </InputAdornment>
                         ),
                     }}
-                    className='m-2'
+                    className="m-2"
+                    onKeyPress={soloNumeros}
+                    onChange={handelPhone}
+                    value={phone}
+                    error={error && phone.length === 0}
                 />
                 <TextField
                     label="Costo"
                     variant="standard"
-                    required
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
-                                < PriceChange />
+                                <PriceChange />
                             </InputAdornment>
                         ),
                     }}
-                    className='m-2'
+                    className="m-2"
+                    onKeyPress={soloNumeros}
+                    onChange={handelPrice}
+                    value={price}
+                    error={error && price.length === 1}
                 />
                 <TextField
                     label="Descripción"
                     variant="standard"
-                    required
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
-                                < Description />
+                                <Description />
                             </InputAdornment>
                         ),
                     }}
                     multiline
-                    rows={5}
-                    className='m-2 mb-4'
+                    rows={2}
+                    className="m-2 mb-4"
+                    onChange={handelDescription}
+                    value={description}
+                    error={error && description.length === 0}
                 />
                 <div>
-                    <Button variant="contained" className='float-end mx-4' color="primary">Registrar</Button>
-                    <Button variant="contained" className='float-end' color="warning">Cancelar</Button> 
+                    <Button
+                        variant="contained"
+                        className="float-end mx-4"
+                        color="primary"
+                        type="submit"
+                    >
+                        Registrar
+                    </Button>
+                    <Button
+                        variant="contained"
+                        className="float-end"
+                        color="warning"
+                        onClick={() => {
+                            history("/");
+                        }}
+                    >
+                        Cancelar
+                    </Button>
                 </div>
             </div>
-
         </form>
+    );
+};
 
-    )
-}
-
-
-export default Form
+export default Form;
