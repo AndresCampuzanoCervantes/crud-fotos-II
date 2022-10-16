@@ -6,17 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../structure/firebase';
-const dataTest = {
-    id: 1,
-    name: 'name',
-    city: 'nombre',
-    price: '$1',
-    description: 'Aliquam dapibus, lorem vel mattis aliquet, purus lorem tincidunt mauris, in blandit quam risus sed ipsum Aliquam dapibus, Aliquam dapibus, lorem vel mattis aliquet, purus lorem tincidunt mauris, in blandit quam risus sed ipsum lorem vel mattis aliquet, purus lorem tincidunt mauris, in blandit quam risus sed ipsum Aliquam dapibus, lorem vel mattis aliquet, purus lorem tincidunt mauris, in blandit quam risus sed ipsum',
-    author: 'sadf',
-    phone: 'asdf',
-    imagen: 'https://picsum.photos/150',
-    captureDate: "16/10/2022"
-}
+
 const Home = () => {
     const [rows, setRows] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -43,7 +33,7 @@ const Home = () => {
     }
 
     const deleteDoc = (id) => {
-        history('/edit/' + id)
+        // history('/edit/' + id)
     }
 
     const EditToolbar = (props) => {

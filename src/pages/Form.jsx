@@ -1,7 +1,7 @@
-import { AccountCircle, LocationCityRounded, Phone, PriceChange, Description, Pinterest, Cancel, Edit, Save, ArrowBack} from "@mui/icons-material";
+import { AccountCircle, LocationCityRounded, Phone, PriceChange, Description, Pinterest, Cancel, Edit, Save, ArrowBack } from "@mui/icons-material";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { Alert, Button, InputAdornment, TextField } from "@mui/material";
-import { collection, addDoc, updateDoc } from "firebase/firestore"
+import { collection, addDoc, updateDoc, doc, onSnapshot } from "firebase/firestore"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -9,11 +9,10 @@ import { db } from "../structure/firebase";
 import axios from "axios";
 import dayjs from "dayjs";
 import 'dayjs/locale/es';
-
+import { LoadingButton } from '@mui/lab';
 const Form = () => {
     const params = useParams();
     const history = useNavigate();
-    const [id, setId] = useState('');
     const [name, setName] = useState('');
     const [author, setAuthor] = useState('');
     const [city, setCity] = useState('');
@@ -25,6 +24,7 @@ const Form = () => {
     const [error, setError] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [editMode, setEditMode] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (error) {
@@ -34,13 +34,35 @@ const Form = () => {
 
     useEffect(() => {
         if (params.id) {
-            setId(params.id);
+            getPictureSale(params.id);
             setEditMode(true);
         } else {
             getImagen()
         }
-
     }, []);
+
+    const getPictureSale = (id) => {
+        try {
+            onSnapshot(collection(db, 'pictureSale'), (query) => {
+                const doc = query.docs.find(item => item.id === params.id);
+                const docRef = {
+                    ...doc.data(),
+                    id: doc.id,
+                }
+
+                setName(docRef.name);
+                setAuthor(docRef.author);
+                setCity(docRef.city);
+                setCaptureDate(dayjs(docRef.captureDate.split('/').reverse().join('-')));
+                setPhone(docRef.phone);
+                setPrice(docRef.price);
+                setDescription(docRef.description);
+                setImagen(docRef.imagen);
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
     const getImagen = () => {
         axios.get("https://picsum.photos/300")
@@ -175,7 +197,7 @@ const Form = () => {
     const handelSubmit = async (e) => {
         try {
             e.preventDefault();
-
+            setLoading(true);
             if (validateFields()) {
                 return;
             } else {
@@ -193,18 +215,26 @@ const Form = () => {
                 description,
                 imagen
             }
-            const data = await addDoc(collection(db, 'pictureSale'), newPictureSale);
-
-            if (data.id) {
-                history("/");
-                return;
+            let data = {}
+            if (!editMode) {
+                data = await addDoc(collection(db, 'pictureSale'), newPictureSale);
+            } else {
+                const docRef = doc(db, 'pictureSale', params.id);
+                await updateDoc(docRef, newPictureSale).then(() => history("/"));
             }
-            throw new Error("Error al momento de registrar.");
+            setTimeout(() => {
+                setLoading(false);
+                if (data.id) {
+                    history("/");
+                    return;
+                }
+            }, 3000);
+
+            // throw new Error("Error al momento de registrar.");
         } catch (error) {
             console.error(error);
         }
     }
-    //onSubmit={modoEdicion ? editarFrutas : guardarFrutas}
 
     return (
         <form onSubmit={handelSubmit}>
@@ -244,6 +274,7 @@ const Form = () => {
                     onChange={handelName}
                     value={name}
                     error={error && name.length === 0}
+                    disabled={loading}
                 />
                 <TextField
                     label="Autor"
@@ -259,6 +290,7 @@ const Form = () => {
                     onChange={handelAuthor}
                     value={author}
                     error={error && author.length === 0}
+                    disabled={loading}
                 />
                 <TextField
                     label="Ciudad"
@@ -274,6 +306,7 @@ const Form = () => {
                     onChange={handelCity}
                     value={city}
                     error={error && city.length === 0}
+                    disabled={loading}
                 />
                 <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
                     <DatePicker
@@ -282,7 +315,8 @@ const Form = () => {
                         views={["year", "month", "day"]}
                         value={captureDate}
                         onChange={handelCaptureDate}
-                        renderInput={(params) => < TextField  {...params} variant="standard" className="m-2" error={error && captureDate.length === 0} />}
+                        disabled={loading}
+                        renderInput={(props) => < TextField  {...props} variant="standard" className="m-2" error={error && captureDate.length === 0} />}
                     />
                 </LocalizationProvider>
                 <TextField
@@ -300,6 +334,7 @@ const Form = () => {
                     onChange={handelPhone}
                     value={phone}
                     error={error && phone.length === 0}
+                    disabled={loading}
                 />
                 <TextField
                     label="Costo"
@@ -316,6 +351,7 @@ const Form = () => {
                     onChange={handelPrice}
                     value={price}
                     error={error && price.length === 1}
+                    disabled={loading}
                 />
                 <TextField
                     label="Descripción"
@@ -333,40 +369,44 @@ const Form = () => {
                     onChange={handelDescription}
                     value={description}
                     error={error && description.length === 0}
+                    disabled={loading}
                 />
                 <div>
                     {
                         editMode ? (
-                            <Button
+                            <LoadingButton
+                                loading={loading}
                                 variant="contained"
                                 className="float-end mx-4"
-                                color="primary"
+                                color="warning"
                                 type="submit"
-                                startIcon={<Edit />}
+                                endIcon={<Edit />}
                             >
                                 Editar
-                            </Button>
+                            </LoadingButton>
                         ) : (
-                            <Button
+                            <LoadingButton
+                                loading={loading}
                                 variant="contained"
                                 className="float-end mx-4"
                                 color="primary"
                                 type="submit"
-                                startIcon={<Save />}
+                                endIcon={<Save />}
                             >
                                 Registrar
-                            </Button>
+                            </LoadingButton>
                         )
                     }
 
                     <Button
+                        disabled={loading}
                         variant="contained"
                         className="float-end"
-                        color="warning"
+                        color="inherit"
                         onClick={() => {
                             history("/");
                         }}
-                        startIcon={<Cancel />}
+                        endIcon={<Cancel />}
                     >
                         Cancelar
                     </Button>
