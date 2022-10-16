@@ -26,13 +26,12 @@ const Home = () => {
         const { history } = props;
         const ref = useRef();
         useEffect(() => {
-            console.log(ref);
             ref.current.innerHTML = "<span class=\"MuiButton-startIcon MuiButton-iconSizeSmall css-y6rp3m-MuiButton-startIcon\"><svg class=\"MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-i4bv87-MuiSvgIcon-root\" focusable=\"false\" aria-hidden=\"true\" viewBox=\"0 0 24 24\" data-testid=\"AddIcon\"><path d=\"M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z\"></path></svg></span>Registrar<span class=\"MuiTouchRipple-root css-8je8zh-MuiTouchRipple-root\"></span>"
         }, [ref])
         return (
             <GridToolbarContainer className='border-bottom'>
-                <GridToolbarColumnsButton color="primary" startIcon={<AddIcon />} onClick={() => { history("/create") }} variant="outlined" className='mb-1' ref={referent => ref.current = referent} />
-                <GridToolbarColumnsButton className='mx-2 mb-1' variant="outlined" />
+                <GridToolbarColumnsButton className='m-2' variant="contained" />
+                <GridToolbarColumnsButton color="primary"  startIcon={<AddIcon />} onClick={() => { history("/create") }} variant="contained" className='m-2' ref={referent => ref.current = referent} />
             </GridToolbarContainer>
         );
     }

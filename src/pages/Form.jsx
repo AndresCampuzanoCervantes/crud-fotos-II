@@ -1,20 +1,14 @@
-import { useState, useEffect } from "react";
-import { Alert, Button, InputAdornment, TextField } from "@mui/material";
-import {
-    AccountCircle,
-    LocationCityRounded,
-    Phone,
-    PriceChange,
-    Description,
-    Event,
-    Pinterest,
-} from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
-import dayjs from "dayjs";
+import { AccountCircle, LocationCityRounded, Phone, PriceChange, Description, Pinterest, Add, Cancel, } from "@mui/icons-material";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+import { Alert, Button, InputAdornment, TextField } from "@mui/material";
+import { collection, addDoc, updateDoc} from "firebase/firestore"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import 'dayjs/locale/es';
+import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { db } from "../structure/firebase";
 import axios from "axios";
+import dayjs from "dayjs";
+import 'dayjs/locale/es';
 
 const Form = () => {
     const history = useNavigate();
@@ -169,22 +163,36 @@ const Form = () => {
         }
     }
 
-    const handelSubmit = (e) => {
-        e.preventDefault();
-        if (validateFields()) {
-            return;
-        } else {
-            setError(false);
-            setErrorMessage('');
-        }
-        const newPictureSale = {
-            name,
-            author,
-            city,
-            captureDate: captureDate.format('DD/MM/YYYY'),
-            phone,
-            price,
-            description
+    const handelSubmit = async(e) => {
+        try {
+            e.preventDefault();
+
+            if (validateFields()) {
+                return;
+            } else {
+                setError(false);
+                setErrorMessage('');
+            }
+
+            const newPictureSale = {
+                name,
+                author,
+                city,
+                captureDate: captureDate.format('DD/MM/YYYY'),
+                phone,
+                price,
+                description,
+                imagen
+            }
+            const data = await addDoc(collection(db,'pictureSale'),newPictureSale);
+
+            if (data.id) {
+                history("/");
+                return;
+            }
+            throw new Error("Error al momento de registrar.");
+        } catch (error) {
+            console.error(error);
         }
     }
     //onSubmit={modoEdicion ? editarFrutas : guardarFrutas}
@@ -323,6 +331,7 @@ const Form = () => {
                         className="float-end mx-4"
                         color="primary"
                         type="submit"
+                        startIcon={<Add />}
                     >
                         Registrar
                     </Button>
@@ -333,6 +342,7 @@ const Form = () => {
                         onClick={() => {
                             history("/");
                         }}
+                        startIcon={<Cancel />}
                     >
                         Cancelar
                     </Button>
